@@ -101,7 +101,10 @@ class ZurichInstrument:
             raise ConnectionError("Not connected to instrument")
         
         full_path = f'/{self.device}/{path}'
-        self.daq.setDouble(full_path, value) if isinstance(value, (int, float)) else self.daq.set(full_path, value)
+        if isinstance(value, (int, float)):
+            self.daq.setDouble(full_path, value)
+        else:
+            self.daq.set(full_path, value)
         
     def get(self, path):
         """
@@ -191,10 +194,14 @@ class ZurichInstrument:
         Args:
             output_index (int): Output channel index (default: 0)
             amplitude (float): Amplitude in volts
+        
+        Note:
+            The wildcard '*' in the path sets all amplitude components.
         """
         if not self.daq:
             raise ConnectionError("Not connected to instrument")
         
+        # The wildcard '*' sets all amplitude components for the output
         path = f'/{self.device}/sigouts/{output_index}/amplitudes/*'
         self.daq.setDouble(path, amplitude)
         
